@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Delivery HQ</h1>
+        <p style="color: var(--text-secondary);">Track and fulfill your assigned orders</p>
+    </div>
+</div>
+
+<div style="background: var(--card-bg); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+    <h2 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.25rem;">Active Deliveries</h2>
+    {% if assigned_orders %}
+        <div style="display: grid; gap: 1rem;">
+            {% for order in assigned_orders %}
+                <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin-bottom: 0.5rem;">Order #{{ order.id }}</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">To: <strong>{{ order.user.username }}</strong></p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Items: {{ order.items.count }} (Total: ${{ order.total_price }})</p>
+                    </div>
+                    <div>
+                        <form action="{% url 'update_order_status' order.id %}" method="post" style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                            {% csrf_token %}
+                            <select name="status" style="padding: 0.6rem; border-radius: 6px; background: #0f172a; color: white; border: 1px solid var(--border-color); width: 180px;">
+                                <option value="ASSIGNED" {% if order.status == 'ASSIGNED' %}selected{% endif %}>Preparing / Received</option>
+                                <option value="OUT_FOR_DELIVERY" {% if order.status == 'OUT_FOR_DELIVERY' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Mark as Delivered</option>
+                            </select>
+                            <button type="submit" class="btn" style="padding: 0.4rem 1rem; font-size: 0.9rem; background: #10b981;">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">You have no active orders queued for delivery!</p>
+    {% endif %}
+</div>
+
+<div style="background: var(--card-bg); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color);">
+    <h2 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.25rem;">Previously Completed</h2>
+    <ul style="list-style: none; padding: 0;">
+        {% for order in past_orders %}
+            <li style="padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+                <span>Order #{{ order.id }} ({{ order.user.username }})</span>
+                <span style="color: #10b981; font-weight: bold;">Delivered on {{ order.created_at|date:"M d" }}</span>
+            </li>
+        {% empty %}
+            <li style="color: var(--text-secondary); padding: 1rem 0;">No completed orders found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

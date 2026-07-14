@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <h1>Create an Account</h1>
+        <p style="color: var(--text-secondary);">Join our platform today.</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field.errors }}
+                
+                {% if field.name == 'role' %}
+                    <select name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}">
+                        {% for choice in field.field.choices %}
+                            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}" {% if field.field.required %}required{% endif %}>
+                {% endif %}
+                
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+    </form>
+    
+    <div class="form-footer">
+        Already have an account? <a href="{% url 'login' %}">Sign In</a>
+    </div>
+</div>
+{% endblock %}

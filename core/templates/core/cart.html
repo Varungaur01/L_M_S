@@ -1,0 +1,59 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Your Shopping Cart</h1>
+    <p style="color: var(--text-secondary);">Review your items and proceed to checkout.</p>
+</div>
+
+{% if items %}
+    <div style="background: var(--card-bg); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color);">
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                    <th style="padding-bottom: 1rem;">Product</th>
+                    <th style="padding-bottom: 1rem;">Price</th>
+                    <th style="padding-bottom: 1rem;">Quantity</th>
+                    <th style="padding-bottom: 1rem;">Total</th>
+                    <th style="padding-bottom: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1.5rem 0;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+                            <strong>{{ item.product.name }}</strong>
+                        </div>
+                    </td>
+                    <td style="padding: 1.5rem 0;">${{ item.product.price }}</td>
+                    <td style="padding: 1.5rem 0;">{{ item.quantity }}</td>
+                    <td style="padding: 1.5rem 0;"><strong>${% widthratio item.product.price 1 item.quantity %}</strong></td>
+                    <td style="padding: 1.5rem 0;">
+                        <form action="{% url 'remove_from_cart' item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold;">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 1.5rem;">Total: <strong style="color: #10b981;">${{ total }}</strong></div>
+            <form action="{% url 'checkout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="padding: 0.8rem 2rem; font-size: 1.1rem;">Checkout</button>
+            </form>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">Your cart is empty</h2>
+        <p style="margin-bottom: 1.5rem;">Looks like you haven't added anything yet.</p>
+        <a href="{% url 'explore' %}" class="btn">Start Shopping</a>
+    </div>
+{% endif %}
+{% endblock %}

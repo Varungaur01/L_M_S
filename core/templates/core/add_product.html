@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <div class="page-header">
+        <h1>Add New Product</h1>
+        <p style="color: var(--text-secondary);">List an item in the marketplace</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field.errors }}
+                {{ field }}
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <a href="{% url 'dashboard' %}" class="btn" style="background: rgba(255, 255, 255, 0.1); flex: 1;">Cancel</a>
+            <button type="submit" class="btn" style="flex: 2;">List Product</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

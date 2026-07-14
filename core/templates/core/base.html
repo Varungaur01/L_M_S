@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affa - Elegant E-Commerce</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'explore' %}" class="nav-brand">Affa</a>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <span class="nav-role-badge">{{ user.role }}</span>
+                {% if user.role == 'SHOPKEEPER' %}
+                    <a href="{% url 'dashboard' %}">Seller Dashboard</a>
+                {% elif user.role == 'ADMIN' %}
+                    <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                {% elif user.role == 'DELIVERY' %}
+                    <a href="{% url 'delivery_dashboard' %}">Deliveries</a>
+                {% elif user.role == 'USER' %}
+                    <a href="{% url 'view_cart' %}">My Cart ({{ user.cart.items.count|default:"0" }})</a>
+                {% endif %}
+                <a href="{% url 'explore' %}">Explore</a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Sign Out</button>
+                </form>
+            {% else %}
+                <a href="{% url 'explore' %}">Explore</a>
+                <a href="{% url 'login' %}">Sign In</a>
+                <a href="{% url 'signup' %}" class="btn">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Processing...';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

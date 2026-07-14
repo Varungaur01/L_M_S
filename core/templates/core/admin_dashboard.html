@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Administrator Dashboard</h1>
+        <p style="color: var(--text-secondary);">Manage pending orders and operational fulfillment</p>
+    </div>
+</div>
+
+<div style="background: var(--card-bg); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color);">
+    <h2 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.25rem;">Recent Orders</h2>
+    <table style="width: 100%; text-align: left; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                <th style="padding-bottom: 1rem;">Order ID</th>
+                <th style="padding-bottom: 1rem;">Customer</th>
+                <th style="padding-bottom: 1rem;">Amount</th>
+                <th style="padding-bottom: 1rem;">Date</th>
+                <th style="padding-bottom: 1rem;">Status</th>
+                <th style="padding-bottom: 1rem;">Assign Delivery</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 1.25rem 0; font-weight: bold;">#{{ order.id }}</td>
+                <td style="padding: 1.25rem 0;">{{ order.user.username }}</td>
+                <td style="padding: 1.25rem 0;">${{ order.total_price }}</td>
+                <td style="padding: 1.25rem 0;">{{ order.created_at|date:"M d, H:i" }}</td>
+                <td style="padding: 1.25rem 0;">
+                    <span style="padding: 0.3rem 0.6rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+                        {% if order.status == 'PENDING' %}background: rgba(234, 179, 8, 0.2); color: #eab308;
+                        {% elif order.status == 'ASSIGNED' %}background: rgba(99, 102, 241, 0.2); color: #6366f1;
+                        {% elif order.status == 'DELIVERED' %}background: rgba(16, 185, 129, 0.2); color: #10b981;
+                        {% else %}background: rgba(14, 165, 233, 0.2); color: #0ea5e9;{% endif %}
+                    ">
+                        {{ order.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 1.25rem 0;">
+                    {% if order.status == 'PENDING' %}
+                        <form action="{% url 'assign_order' order.id %}" method="post" style="display: flex; gap: 0.5rem;">
+                            {% csrf_token %}
+                            <select name="delivery_boy" style="padding: 0.4rem; border-radius: 4px; background: #0f172a; color: white; border: 1px solid var(--border-color); width: 120px;" required>
+                                <option value="" disabled selected>Select Courier</option>
+                                {% for boy in delivery_boys %}
+                                    <option value="{{ boy.id }}">{{ boy.username }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Assign</button>
+                        </form>
+                    {% else %}
+                        <span style="color: var(--text-secondary);">Assigned to {{ order.delivery_boy.username }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders have been placed yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

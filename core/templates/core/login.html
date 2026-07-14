@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <h1>Welcome Back</h1>
+        <p style="color: var(--text-secondary);">Sign in to continue to Affa</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field.errors }}
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}" required>
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Sign In</button>
+    </form>
+    
+    <div class="form-footer">
+        Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+    </div>
+</div>
+{% endblock %}

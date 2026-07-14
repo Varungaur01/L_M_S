@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Shopkeeper Dashboard</h1>
+        <p style="color: var(--text-secondary);">Manage your products and store</p>
+    </div>
+    <a href="{% url 'add_product' %}" class="btn">+ Add Product</a>
+</div>
+
+{% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.src='https://via.placeholder.com/400x300.png?text=Image+Not+Found'">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-title">{{ product.name }}</h3>
+                    <p class="product-desc">{{ product.description|truncatewords:15 }}</p>
+                    <div class="product-footer">
+                        <span class="product-price">${{ product.price }}</span>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Added: {{ product.created_at|date:"M d" }}</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">You have no products listed</h2>
+        <p style="margin-bottom: 1.5rem;">Start selling by adding your first product to the catalog.</p>
+        <a href="{% url 'add_product' %}" class="btn">Add First Product</a>
+    </div>
+{% endif %}
+{% endblock %}
